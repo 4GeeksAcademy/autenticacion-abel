@@ -8,11 +8,13 @@ ALGORITHM = "HS256"
 
 
 def create_token(user_id, minutes=60):
-    now = datetime.datetime.utcnow()
+    # use timezone-aware UTC datetimes to avoid deprecation warnings
+    now = datetime.datetime.now(datetime.timezone.utc)
     payload = {
         "sub": str(user_id),
-        "iat": now,
-        "exp": now + datetime.timedelta(minutes=minutes),
+        # issued-at and expiration must be numeric timestamps for JWTs
+        "iat": int(now.timestamp()),
+        "exp": int((now + datetime.timedelta(minutes=minutes)).timestamp()),
     }
     token = jwt.encode(payload, SECRET, algorithm=ALGORITHM)
     return token

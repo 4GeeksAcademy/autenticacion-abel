@@ -64,8 +64,12 @@ def private():
     payload = verify_token(token)
     if not payload:
         return jsonify({"message": "invalid token"}), 401
+
+    # token ok -> lookup user by id
     user_id = payload.get("sub")
-    user = User.query.get(user_id)
+    # use Session.get for SQLAlchemy 1.x+ compatibility
+    user = db.session.get(User, user_id)
+
     if not user:
         return jsonify({"message": "user not found"}), 401
     return jsonify({"message": "access granted", "user": user.serialize()}), 200
