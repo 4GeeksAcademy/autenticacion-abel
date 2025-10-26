@@ -46,7 +46,7 @@ def token():
     user = User.query.filter_by(email=email).first()
     if not user or not check_password_hash(user.password, password):
         return jsonify({"message": "invalid credentials"}), 401
-    token = create_token(user.id)
+    token = create_token(user.id, email=user.email)
     return jsonify({"token": token}), 200
 
 
@@ -73,3 +73,30 @@ def private():
     if not user:
         return jsonify({"message": "user not found"}), 401
     return jsonify({"message": "access granted", "user": user.serialize()}), 200
+
+
+@api.route("/logout", methods=["POST"])
+def logout():
+    auth = request.headers.get("Authorization", "")
+    token = None
+    parts = auth.split()
+    if len(parts) == 2 and parts[0].lower() == "bearer":
+        token = parts[1]
+    if not token:
+        token = request.args.get("token")
+    if not token:
+        return jsonify({"message": "missing token"}), 400
+    payload = verify_token(token)
+    if not payload:
+        return jsonify({"message": "invalid token"}), 401
+    jti = payload.get("jti")
+    if not jti:
+        return jsonify({"message": "token has no jti"}), 400
+    from api.models import RevokedToken
+
+    if RevokedToken.query.filter_by(jti=jti).first():
+        return jsonify({"message": "token already revoked"}), 200
+    revoked = RevokedToken(jti=jti)
+    db.session.add(revoked)
+    db.session.commit()
+    return jsonify({"message": "token revoked"}), 200

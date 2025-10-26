@@ -1,3 +1,4 @@
 [flake8]
 max-line-length = 88
-ignore = E402, W503
+ignore = E402, W503, D100, D101, D102, D103, D104, D107, D400, E231
+exclude = migrations,docs/assets,.venv

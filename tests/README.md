@@ -28,3 +28,5 @@ python -m pip install pre-commit
 pre-commit install
 pre-commit run --all-files
 ```
+
+If you already have pre-commit installed, run `pre-commit run --all-files` after pulling changes to ensure your working tree matches the repository style.
