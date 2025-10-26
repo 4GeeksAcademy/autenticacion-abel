@@ -6,3 +6,5 @@ PyJWT
 werkzeug
 python-dotenv
 Jinja2
+flask-swagger
+flask-admin
