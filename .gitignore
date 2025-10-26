@@ -2,8 +2,9 @@
 .*
 
 # track this file .gitignore (i.e. do NOT ignore it)
-!.gitignore
-!.github
+.gitignore
+.github
+!.flake8
 php_errorlog
 .log
 

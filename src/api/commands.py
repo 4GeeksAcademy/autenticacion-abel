@@ -1,21 +1,23 @@
-
 import click
-from api.models import db, User
 
+from api.models import User, db
+
+"""Small helpers to register Flask CLI commands.
+
+Use @app.cli.command to add commands that run with the Flask CLI. Examples:
+- flask insert-test-users 5  # create 5 test users
 """
-In this file, you can add as many commands as you want using the @app.cli.command decorator
-Flask commands are usefull to run cronjobs or tasks outside of the API but sill in integration 
-with youy database, for example: Import the price of bitcoin every night as 12am
-"""
+
+
 def setup_commands(app):
-    
-    """ 
-    This is an example command "insert-test-users" that you can run from the command line
-    by typing: $ flask insert-test-users 5
-    Note: 5 is the number of users to add
+    """Register example CLI commands used for local development.
+
+    The example below shows how to register `insert-test-users` which accepts a
+    numeric count and creates that many test users in the database.
     """
-    @app.cli.command("insert-test-users") # name of our command
-    @click.argument("count") # argument of out command
+
+    @app.cli.command("insert-test-users")  # name of our command
+    @click.argument("count")  # argument of out command
     def insert_test_users(count):
         print("Creating test users")
         for x in range(1, int(count) + 1):
