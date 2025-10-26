@@ -1,11 +1,16 @@
 import os
 import sys
+import pytest
 
 # Ensure the repository's src/ is importable for tests
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "src")
 if SRC not in sys.path:
     sys.path.insert(0, SRC)
+
+# bring app and db into tests
+from api.models import db
+from app import app
 
 # Compatibility shim for upstream flask-admin API changes used only in tests.
 try:
@@ -25,3 +30,19 @@ except Exception:
     # If flask_admin isn't installed in the environment yet, tests/install will
     # bring it in; ignore here to avoid import-time failures.
     pass
+
+
+@pytest.fixture
+def client(tmp_path):
+    db_path = tmp_path / "test.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+    app.config["TESTING"] = True
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+        client = app.test_client()
+        yield client
+        try:
+            db.session.remove()
+        except Exception:
+            pass

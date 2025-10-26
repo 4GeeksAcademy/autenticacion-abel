@@ -1,15 +1,13 @@
-import time
-
 from api.auth import create_token
-from api.models import db
-
 
 def test_invalid_credentials(client):
     # requesting a token with wrong password should fail
     r = client.post("/api/signup", json={"email": "bob@example.com", "password": "pw"})
     assert r.status_code == 200
 
-    r = client.post("/api/token", json={"email": "bob@example.com", "password": "wrong"})
+    r = client.post(
+        "/api/token", json={"email": "bob@example.com", "password": "wrong"}
+    )
     assert r.status_code == 401
 
 
