@@ -1,5 +1,6 @@
 import os
 import sys
+
 import pytest
 
 # Ensure the repository's src/ is importable for tests
@@ -7,10 +8,6 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "src")
 if SRC not in sys.path:
     sys.path.insert(0, SRC)
-
-# bring app and db into tests
-from api.models import db
-from app import app
 
 # Compatibility shim for upstream flask-admin API changes used only in tests.
 try:
@@ -30,6 +27,10 @@ except Exception:
     # If flask_admin isn't installed in the environment yet, tests/install will
     # bring it in; ignore here to avoid import-time failures.
     pass
+
+# bring app and db into tests (after shim)
+from api.models import db
+from app import app
 
 
 @pytest.fixture

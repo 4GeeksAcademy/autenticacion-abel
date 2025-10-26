@@ -1,5 +1,6 @@
 from api.auth import create_token
 
+
 def test_invalid_credentials(client):
     # requesting a token with wrong password should fail
     r = client.post("/api/signup", json={"email": "bob@example.com", "password": "pw"})
