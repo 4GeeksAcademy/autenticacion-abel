@@ -100,3 +100,16 @@ isort --profile black src tests
 black --line-length 88 src tests
 flake8 src tests
 ```
+
+### Pre-commit hooks (recomendado)
+
+Para evitar problemas de formato y lint antes de crear commits, instala y activa los hooks de pre-commit:
+
+```bash
+python -m pip install pre-commit
+pre-commit install
+# ejecutar los hooks en todos los archivos (opcional)
+pre-commit run --all-files
+```
+
+Esto ejecutará Black, isort y flake8 automáticamente y ayudará a mantener el código limpio.
