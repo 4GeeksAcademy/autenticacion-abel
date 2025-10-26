@@ -29,9 +29,9 @@ jobs:
       - name: Run linters
         run: |
           echo "Running flake8..."
-          flake8 src tests || true
+          flake8 src tests
           echo "Running pycodestyle..."
-          pycodestyle --config=pycodestyle.cfg src tests || true
+          pycodestyle --config=pycodestyle.cfg src tests
       - name: Run pytest
         run: |
           pytest -q
