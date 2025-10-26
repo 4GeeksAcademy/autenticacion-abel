@@ -79,3 +79,24 @@ Esta plantilla está 100% lista para desplegarse con Render.com y Heroku en cues
 Esta plantilla fue construida como parte del [Coding Bootcamp](https://4geeksacademy.com/us/coding-bootcamp) de 4Geeks Academy por [Alejandro Sanchez](https://twitter.com/alesanchezr) y muchos otros contribuyentes. Descubre más sobre nuestro [Curso de Desarrollador Full Stack](https://4geeksacademy.com/us/coding-bootcamps/part-time-full-stack-developer) y [Bootcamp de Ciencia de Datos](https://4geeksacademy.com/us/coding-bootcamps/datascience-machine-learning).
 
 Puedes encontrar otras plantillas y recursos como este en la [página de github de la escuela](https://github.com/4geeksacademy/).
+
+### Variables de entorno
+
+Hay un fichero de ejemplo `.env.example` en la raíz del proyecto. Copia ese fichero a `.env` y edítalo si necesitas cambiar la clave JWT o la URL de la base de datos:
+
+```bash
+cp .env.example .env
+# editar .env según tu entorno
+```
+
+### Ejecutar tests y linters (rápido)
+
+Instala las dependencias mínimas y ejecuta tests y linters:
+
+```bash
+python -m pip install -r requirements_minimal.txt pytest flake8 black isort
+pytest -q
+isort --profile black src tests
+black --line-length 88 src tests
+flake8 src tests
+```
