@@ -6,13 +6,13 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "src")
 sys.path.insert(0, SRC)
 
-import pytest
+import pytest  # noqa: E402
 
 # Compatibility shim for upstream flask-admin API changes: allow existing code that
 # calls Admin(..., template_mode=...) to keep working during tests by wrapping
 # the Admin class at import time. This only affects the test process, not app code.
 try:
-    import flask_admin
+    import flask_admin  # noqa: E402
 
     _OrigAdmin = getattr(flask_admin, "Admin", None)
     if _OrigAdmin is not None:
