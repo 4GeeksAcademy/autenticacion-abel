@@ -27,8 +27,8 @@ except Exception:
     # If flask_admin is not installed yet, test environment will install it via CI.
     pass
 
-from api.models import db
-from app import app
+from api.models import db  # noqa: E402
+from app import app  # noqa: E402
 
 
 @pytest.fixture
