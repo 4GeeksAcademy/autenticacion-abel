@@ -1,17 +1,20 @@
 """Test fixtures for the application test suite."""
 
+import importlib.util
 import os
 import sys
 
 import pytest
-
-import tests._shims as _shims
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "src")
 if SRC not in sys.path:
     sys.path.insert(0, SRC)
 
+_shims_path = os.path.join(os.path.dirname(__file__), "_shims.py")
+_spec = importlib.util.spec_from_file_location("_test_shims", _shims_path)
+_shims = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_shims)
 _ = _shims
 
 
