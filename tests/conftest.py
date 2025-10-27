@@ -1,42 +1,31 @@
+"""Test fixtures for the application test suite."""
+
+import importlib.util
 import os
 import sys
 
 import pytest
 
-# Ensure the repository's src/ is importable for tests
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "src")
 if SRC not in sys.path:
     sys.path.insert(0, SRC)
 
-# Compatibility shim for upstream flask-admin API changes used only in tests.
-try:
-    import flask_admin
-
-    _OrigAdmin = getattr(flask_admin, "Admin", None)
-    if _OrigAdmin is not None:
-
-        class _CompatAdmin(_OrigAdmin):
-            def __init__(self, *args, **kwargs):
-                # some versions accept template_mode; pop it if present
-                kwargs.pop("template_mode", None)
-                super().__init__(*args, **kwargs)
-
-        flask_admin.Admin = _CompatAdmin
-except Exception:
-    # If flask_admin isn't installed in the environment yet, tests/install will
-    # bring it in; ignore here to avoid import-time failures.
-    pass
-
-# bring app and db into tests (after shim)
-from api.models import db
-from app import app
+_shims_path = os.path.join(os.path.dirname(__file__), "_shims.py")
+_spec = importlib.util.spec_from_file_location("_test_shims", _shims_path)
+_shims = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_shims)
+_ = _shims
 
 
 @pytest.fixture
 def client(tmp_path):
+    """Provide a Flask test client with a temporary SQLite database."""
+    from api.models import db
+    from app import app
+
     db_path = tmp_path / "test.db"
-    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + str(db_path)
     app.config["TESTING"] = True
     with app.app_context():
         db.drop_all()
