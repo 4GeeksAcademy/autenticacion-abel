@@ -5,7 +5,15 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
+"""Database models for the application.
+
+Contains the User model and the RevokedToken model used for JWT revocation.
+"""
+
+
 class User(db.Model):
+    """A user account."""
+
     __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -14,10 +22,13 @@ class User(db.Model):
     is_active = db.Column(db.Boolean(), nullable=False, default=True)
 
     def serialize(self):
+        """Return a JSON-serializable representation (without password)."""
         return {"id": self.id, "email": self.email}
 
 
 class RevokedToken(db.Model):
+    """A revoked JWT identifier (jti) stored to invalidate tokens on logout."""
+
     __tablename__ = "revoked_token"
 
     id = db.Column(db.Integer, primary_key=True)
