@@ -2,15 +2,10 @@ name: Run tests (pytest)
 
 on:
   workflow_dispatch: {}
-  # Allow PRs targeting main (run in pull_request context)
   pull_request:
     branches: [main]
-  # Also run on pushes to any branch in this repository so feature branch pushes
-  # reliably trigger CI runs without needing the CLI dispatch.
   push:
-    branches: ['**']
-  # Use pull_request_target so we run in the context of the base branch when
-  # needed (useful for trusted repo contributors). Be cautious with untrusted PRs.
+    branches: ["**"]
   pull_request_target:
     branches: [main]
 
