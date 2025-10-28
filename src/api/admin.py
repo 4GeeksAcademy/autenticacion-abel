@@ -12,8 +12,6 @@ def setup_admin(app):
     try:
         admin = Admin(app, name="4Geeks Admin", template_mode="bootstrap3")
     except TypeError:
-        # Some versions of flask-admin removed the 'template_mode' parameter.
-        # Fall back to creating Admin without it for compatibility.
         admin = Admin(app, name="4Geeks Admin")
 
     # Add your models here, for example this is how we add a the User model to the admin
