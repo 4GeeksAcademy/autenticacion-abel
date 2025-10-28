@@ -25,6 +25,13 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements_minimal.txt') }}-3.10
           restore-keys: |
             ${{ runner.os }}-pip-
+      - name: Cache pip wheels
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip/wheels
+          key: ${{ runner.os }}-pip-wheels-${{ hashFiles('**/requirements_minimal.txt') }}-3.10
+          restore-keys: |
+            ${{ runner.os }}-pip-wheels-
       - name: Install pip and build tools
         run: |
           python -m pip install --upgrade pip
