@@ -33,4 +33,18 @@ def setup_commands(app):
 
     @app.cli.command("insert-test-data")
     def insert_test_data():
-        pass
+        users = [
+            ("cli_user1@test.com", "pw1"),
+            ("cli_user2@test.com", "pw2"),
+            ("cli_user3@test.com", "pw3"),
+        ]
+        for email, pw in users:
+            if not User.query.filter_by(email=email).first():
+                u = User()
+                u.email = email
+                u.password = pw
+                u.is_active = True
+                db.session.add(u)
+                db.session.commit()
+                print("Created:", email)
+        print("insert_test_data complete")

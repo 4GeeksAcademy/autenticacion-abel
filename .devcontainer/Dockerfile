@@ -22,6 +22,3 @@ RUN if [ -s /tmp/requirements_minimal.txt ]; then \
         elif [ -s /tmp/requirements.txt ]; then \
             pip3 install --no-cache-dir -r /tmp/requirements.txt || true; \
         fi
-
-
-

@@ -1,33 +1,36 @@
 import datetime
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Boolean, String
-from sqlalchemy.orm import Mapped, mapped_column
 
 db = SQLAlchemy()
 
 
+"""Database models for the application.
+
+Contains the User model and the RevokedToken model used for JWT revocation.
+"""
+
+
 class User(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
+    """A user account."""
+
+    __tablename__ = "user"
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    is_active = db.Column(db.Boolean(), nullable=False, default=True)
 
     def serialize(self):
-        return {
-            "id": self.id,
-            "email": self.email,
-            # do not serialize the password, its a security breach
-        }
+        """Return a JSON-serializable representation (without password)."""
+        return {"id": self.id, "email": self.email}
 
 
 class RevokedToken(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-    jti: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
-    created_at: Mapped[datetime.datetime] = mapped_column(
-        nullable=False, default=datetime.datetime.utcnow
-    )
+    __tablename__ = "revoked_token"
 
-    def __repr__(self):
-        """Return a short representation for debugging."""
-        return f"<RevokedToken jti={self.jti}>"
+    id = db.Column(db.Integer, primary_key=True)
+    jti = db.Column(db.String(64), unique=True, nullable=False)
+    created_at = db.Column(
+        db.DateTime, nullable=False, default=datetime.datetime.utcnow
+    )

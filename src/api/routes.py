@@ -83,20 +83,29 @@ def logout():
     if len(parts) == 2 and parts[0].lower() == "bearer":
         token = parts[1]
     if not token:
+        token = request.get_json(silent=True) or {}
+        token = token.get("token") if isinstance(token, dict) else None
+    if not token:
         token = request.args.get("token")
     if not token:
         return jsonify({"message": "missing token"}), 400
-    payload = verify_token(token)
-    if not payload:
-        return jsonify({"message": "invalid token"}), 401
-    jti = payload.get("jti")
-    if not jti:
-        return jsonify({"message": "token has no jti"}), 400
-    from api.models import RevokedToken
 
-    if RevokedToken.query.filter_by(jti=jti).first():
-        return jsonify({"message": "token already revoked"}), 200
-    revoked = RevokedToken(jti=jti)
-    db.session.add(revoked)
-    db.session.commit()
-    return jsonify({"message": "token revoked"}), 200
+    try:
+        import jwt
+
+        from api.auth import ALGORITHM, SECRET
+        from api.models import RevokedToken
+
+        payload = jwt.decode(
+            token, SECRET, algorithms=[ALGORITHM], options={"verify_exp": False}
+        )
+        jti = payload.get("jti")
+        if not jti:
+            return jsonify({"message": "invalid token"}), 400
+        if not RevokedToken.query.filter_by(jti=jti).first():
+            rt = RevokedToken(jti=jti)
+            db.session.add(rt)
+            db.session.commit()
+        return jsonify({"message": "token revoked"}), 200
+    except Exception:
+        return jsonify({"message": "invalid token"}), 400
