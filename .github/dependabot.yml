@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    # Dependabot will look for requirements files such as requirements.txt
+    # and requirements-locked.txt at the repository root and create PRs to update
+    # pinned dependencies. This is a minimal, beginner-friendly setup.
+    target-branch: "main"
