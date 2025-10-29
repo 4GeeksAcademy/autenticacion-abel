@@ -73,3 +73,38 @@ def private():
     if not user:
         return jsonify({"message": "user not found"}), 401
     return jsonify({"message": "access granted", "user": user.serialize()}), 200
+
+
+@api.route("/logout", methods=["POST"])
+def logout():
+    auth = request.headers.get("Authorization", "")
+    token = None
+    parts = auth.split()
+    if len(parts) == 2 and parts[0].lower() == "bearer":
+        token = parts[1]
+    if not token:
+        token = request.get_json(silent=True) or {}
+        token = token.get("token") if isinstance(token, dict) else None
+    if not token:
+        return jsonify({"message": "missing token"}), 400
+
+    # decode token without verifying expiration to extract jti
+    try:
+        import jwt
+
+        from api.auth import ALGORITHM, SECRET
+        from api.models import RevokedToken
+
+        payload = jwt.decode(
+            token, SECRET, algorithms=[ALGORITHM], options={"verify_exp": False}
+        )
+        jti = payload.get("jti")
+        if not jti:
+            return jsonify({"message": "invalid token"}), 400
+        if not RevokedToken.query.filter_by(jti=jti).first():
+            rt = RevokedToken(jti=jti)
+            db.session.add(rt)
+            db.session.commit()
+        return jsonify({"message": "token revoked"}), 200
+    except Exception:
+        return jsonify({"message": "invalid token"}), 400

@@ -22,23 +22,23 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements_minimal.txt') }}-3.10
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-locked.txt') }}-3.10
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Cache pip wheels
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip/wheels
-          key: ${{ runner.os }}-pip-wheels-${{ hashFiles('**/requirements_minimal.txt') }}-3.10
+          key: ${{ runner.os }}-pip-wheels-${{ hashFiles('**/requirements-locked.txt') }}-3.10
           restore-keys: |
             ${{ runner.os }}-pip-wheels-
       - name: Install pip and build tools
         run: |
           python -m pip install --upgrade pip
-          python -m pip install setuptools==59.6.0 wheel Cython
+          python -m pip install --upgrade wheel
       - name: Install requirements and tools
         run: |
-          python -m pip install --prefer-binary -r requirements_minimal.txt pytest flake8 pycodestyle
+          python -m pip install --prefer-binary -r requirements-locked.txt
       - name: Run linters
         run: |
           echo "Running flake8..."
