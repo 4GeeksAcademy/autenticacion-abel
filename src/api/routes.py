@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS
+from sqlalchemy import select
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from api.auth import create_token, verify_token
@@ -69,12 +70,24 @@ def private():
     user_id = payload.get("sub")
     # Use the Flask-SQLAlchemy query API which works across SQLAlchemy versions
     # and with scoped sessions: fall back to User.query.get(primary_key)
+    # Prefer Session.get() (SQLAlchemy 1.4+). Some scoped_session wrappers
+    # or older environments may not implement Session.get(), so fall back
+    # to a simple select() which is compatible with modern and older
+    # Session implementations.
+    user = None
     try:
         user = db.session.get(User, user_id)
     except Exception:
-        # scoped_session in some environments doesn't implement .get()
-        # so use the ORM query interface which is broadly compatible.
-        user = User.query.get(user_id)
+        # Fallback: perform an explicit select and return the first scalar.
+        stmt = select(User).where(User.id == user_id)
+        try:
+            user = db.session.execute(stmt).scalars().first()
+        except Exception:
+            # As a last resort use the legacy query API if available.
+            try:
+                user = User.query.get(user_id)
+            except Exception:
+                user = None
 
     if not user:
         return jsonify({"message": "user not found"}), 401

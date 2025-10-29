@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timezone
 
 from flask_sqlalchemy import SQLAlchemy
 
@@ -31,6 +31,10 @@ class RevokedToken(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     jti = db.Column(db.String(64), unique=True, nullable=False)
+    # Use timezone-aware UTC timestamps to avoid DeprecationWarning and
+    # to be explicit about timezone handling across environments.
     created_at = db.Column(
-        db.DateTime, nullable=False, default=datetime.datetime.utcnow
+        db.DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
     )
