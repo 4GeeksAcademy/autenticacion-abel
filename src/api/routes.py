@@ -67,8 +67,14 @@ def private():
 
     # token ok -> lookup user by id
     user_id = payload.get("sub")
-    # use Session.get for SQLAlchemy 1.x+ compatibility
-    user = db.session.get(User, user_id)
+    # Use the Flask-SQLAlchemy query API which works across SQLAlchemy versions
+    # and with scoped sessions: fall back to User.query.get(primary_key)
+    try:
+        user = db.session.get(User, user_id)
+    except Exception:
+        # scoped_session in some environments doesn't implement .get()
+        # so use the ORM query interface which is broadly compatible.
+        user = User.query.get(user_id)
 
     if not user:
         return jsonify({"message": "user not found"}), 401
