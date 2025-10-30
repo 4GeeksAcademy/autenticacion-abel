@@ -35,11 +35,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install --prefer-binary -r requirements.txt
 
-      - name: Run linters (flake8)
+      - name: Check for tests
+        id: has_tests
         run: |
-          # run flake8 only on source and tests to avoid noisy generated files
+          echo "count=$(git ls-files 'tests/**/*.py' | wc -l)" >> $GITHUB_OUTPUT
+
+      - name: Install dev dependencies (if tests exist)
+        if: steps.has_tests.outputs.count != '0'
+        run: |
+          pip install --prefer-binary -r requirements-dev.txt
+
+      - name: Run linters (flake8) (if tests exist)
+        if: steps.has_tests.outputs.count != '0'
+        run: |
           flake8 src tests || true
 
-      - name: Run tests
+      - name: Run tests (if tests exist)
+        if: steps.has_tests.outputs.count != '0'
         run: |
           pytest -q
